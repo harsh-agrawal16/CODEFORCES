@@ -23,55 +23,75 @@ const int N=2e5+1;
                 cin.tie(NULL);\
                 cout.tie(NULL)
 
+int n,k;
+
+vi countSort(vi arr, vi count_for_sort){
+    vi a(n);
+    forx(i,1,k+1){
+        count_for_sort[i]+=count_for_sort[i-1];
+    }
+
+    for0(i,n){
+        a[count_for_sort[arr[i]] - 1] = arr[i];
+        count_for_sort[arr[i]]--; 
+    }
+    return a;
+}
 
 int main(){
 	fastIO;
-    int n,k;cin>>n>>k;
+    cin>>n>>k;
     vi limits(k+1);
+    vi count_for_sort(k+1,0);
     vi count(k+1,-1);
     vi arr(n);
-    for0(i,n) cin>>arr[i];
+    for0(i,n) {cin>>arr[i];count_for_sort[arr[i]]++;}
     for0(i,k) cin>>limits[i+1];
 
-    sort(arr.begin(),arr.end());
+    arr = countSort(arr,count_for_sort); //Now you have a array sorted in o(n) using count sort.
+    
     count[1] = n;
-    int prev = 1; 
+    int prev=1;
     for0(i,n){
-    	if(arr[i]!=prev){
-    		count[arr[i]] = n - i;
-    		prev = arr[i];
-    	}
+        if(arr[i]!=prev){
+            count[arr[i]] = n - i;
+            prev = arr[i];
+        }
     }
-
     prev = 0;
+    for(int j=k;j>0;j--){
+        if(count[j] == -1){
+            count[j] = prev;
+        }
+        else prev = count[j];
+    }   
+    
     int ans = 0;
-    for(int i=k;i>0;i--){
-    	if(count[i]==-1){
-    		count[i] = prev;
-    	}
-    	else{
-    		prev = count[i];
-    		ll te = ceil((double) count[i] / limits[i]);
-    		if(te>ans) ans = te;
-    	}
+    for0(i,n){
+        int x = ceil(((double) count[arr[i]]) / limits[arr[i]]);
+        if(x>ans) ans = x;
     }
 
     vvi testcases(ans);
     int j = 0;
     for0(i,n){
-    	testcases[j].pb(arr[i]);
-    	j = (j+1)%ans;
+        testcases[j].pb(arr[i]);
+        j = (j+1)%ans;
     }
-
+     
+    //printing the result
     cout<<ans<<endl;
     for0(i,ans){
-    	cout<<testcases[i].size()<<" ";
-    	for0(j,testcases[i].size()){
-    		cout<<testcases[i][j]<<" ";
-    	}
-    	cout<<endl;
+        cout<<testcases[i].size()<<" ";
+        for(auto j : testcases[i]){
+            cout<<j<<" ";
+        }
+        cout<<endl;
     }
 
+
+
+   
 
  
 }
