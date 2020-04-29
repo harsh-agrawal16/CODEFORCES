@@ -23,46 +23,31 @@ const int N=2e5+1;
                 cin.tie(NULL);\
                 cout.tie(NULL)
 
+//Eugene and array
+//A beautiful solution which demonstrates the use of prefix sums.
+//O(n*logn)                
+
 int main(){
 	ll n;
 	cin>>n;
-	vll a(n);
-	for0(i,n) cin>>a[i];
-	unordered_map<ll,ll> HashMap;
-
-	ll ans = 0;
-	ll sum;
-	ll temp=0;
-	for(ll i=0;i<n;i++){
-		sum = a[i];
-		temp = 0;
-		if(sum==0) continue;
-		HashMap[sum] = i;
-		for(ll j=i+1;j<n;j++){
-			sum+=a[j];
-			if(sum==0){
-				ll x = ((j-1)-i) + 1;
-				ans+=x;
-				temp = 0;
-				break;
-			}
-			if(HashMap.find(sum) == HashMap.end()){
-				HashMap[sum] = i;
-				temp = (j-i) + 1;
-			}
-			else{
-				ll x = ((j-1)-i) + 1;
-				ans+=x;
-				temp = 0;
-				break;
-			}
-		}
-		ans+=temp;
-		temp = 0;
-		HashMap.clear();
+	vll prefix(n+1,0);
+	for(ll i=1;i<=n;i++){
+		ll x;
+		cin>>x;
+		prefix[i] = prefix[i-1] + x;
 	}
-
-	if(a[n-1]!=0) ans+=1;
-	cout<<ans<<endl;
+	set<ll> s = {0};
+	ll begin = 0, end =  0;
+	ll ans = 0;
+	while(begin < n){
+		while(end < n && !s.count(prefix[end+1])){
+			s.insert(prefix[end+1]);
+			++end;
+		}
+		ans+=(end-begin);
+		s.erase(prefix[begin]);
+		++begin;
+	}
+	cout<<ans<<endl;	
 }
 
