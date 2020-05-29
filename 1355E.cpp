@@ -26,14 +26,13 @@ const int N=2e5+1;
 long double pi = 3.141592653589793238;
 vll arr;
 vll pref;
-ll n;
+ll n,a,r,m;
+ll sum=0;
 
 ll bsearch(ll low, ll high , ll x){ 
     ll ans = high;
 	while(low<=high){
 		ll mid = (low+high)/2;
-
-		if(arr[mid] == x) return -1;
 
 		if(arr[mid]>x){
 			ans = mid;
@@ -46,12 +45,41 @@ ll bsearch(ll low, ll high , ll x){
 	return ans;
 }
 
+ll fun(ll height){
+	ll index = bsearch(0,n-1,height);
+	ll p = height*(index) - pref[index-1];
+	ll q = (pref[n-1] - pref[index-1])  - (n-index)*height;
+
+	if(p>=q){
+		return (p-q)*a + m*q;
+	} 
+	else{
+		return (q-p)*r + m*p;
+	}
+}
+
+
+ll ternary_search(ll l, ll r){
+
+	while(r-l>3){
+		ll m1 = l + (r-l)/3;
+		ll m2 = r - (r-l)/3;
+
+		if(fun(m2) > fun(m1)) r = m2;
+		else l = m1;
+	}
+    
+    ll ans = fun(l);
+	for(ll i=l;i<=r;i++){
+		ans = min(ans,fun(i));
+	}
+
+	return ans;
+}
 
 
 int main(){
 	fastIO;
-	ll a,r,m;
-	ll sum=0;
 	cin>>n>>a>>r>>m;
 
 	if(n==1){cout<<0<<endl;return 0;}
@@ -63,56 +91,5 @@ int main(){
      //calculated prefix sum to aid me in calculating p and q;
     pref[0] = arr[0];
     for(ll i=1;i<n;i++) pref[i] = pref[i-1] + arr[i];
-   
-
-	ll p = 0,q=0;
-	q = (pref[n-1] - pref[0]) - (n-1)*arr[0];
-	ll ans = (q-p)*r + m*p;
-    ll temp; 
-
-	for(ll i=1;i<n;i++){
-		if(arr[i]==arr[i-1]) continue;
-        p = arr[i]*(i+1) - pref[i];
-        q = (pref[n-1] - pref[i]) - arr[i]*((n-1)-i) ;
-
-		if(q>=p){
-			temp = (q-p)*r + m*p;
-		}
-		else{
-			temp = (p-q)*a + m*q;
-		}
-
-		if(ans>temp) ans = temp;
-	}
-    
-	ll breakpoint = sum/n + 1;
-	ll index = bsearch(0,n-1,breakpoint); //getting the upper_bound
-	if(index!=-1){
-		p = breakpoint*(index) - pref[index-1];
-		q = (pref[n-1] - pref[index-1]) - breakpoint*(n-index);
-
-		if(q>=p){
-			temp = (q-p)*r + m*p;
-		}
-		else{
-			temp = (p-q)*a + m*q;
-		}
-
-		if(temp<ans) ans = temp;
-	}
-
-	breakpoint = sum / n;
-	index = bsearch(0,n-1,breakpoint); 
-	if(index!=-1){
-		p = breakpoint*(index) - pref[index-1];
-		q = (pref[n-1] - pref[index-1]) - breakpoint*(n-index);
-		if(q>=p){
-			temp = (q-p)*r + m*p;
-		}
-		else{
-			temp = (p-q)*a + m*q;
-		}
-		if(temp<ans) ans = temp;
-	}
-	cout<<ans<<endl;
+    cout<<ternary_search(arr[0],arr[n-1]);   
 }
